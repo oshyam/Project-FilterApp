@@ -84,17 +84,17 @@ mTickImageView = (ImageView)findViewById(R.id.imageView11);
                 requestStoragePermissions();
 
                 if(ContextCompat.checkSelfPermission(ControlActivity.this,Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED){
-                    return;
-                     if(ActivityCompat.shouldShowRequestPermissionRationale(ControlActivity.this,Manifest.permission.WRITE_EXTERNAL_STORAGE)){
-                         //SHOW USER A MESSAGE
-                         new MaterialDialog.Builder().title("Permission Required")
-                                 .content("You need to  give the storage to easily save your filtered image")
-                                 .negativeText("No")
-                                 .positiveText("Yes")
-                                 .canceledOnTouchOutside(true)
-                                 .show();
 
-                     } else{
+                    if(ActivityCompat.shouldShowRequestPermissionRationale(ControlActivity.this,Manifest.permission.WRITE_EXTERNAL_STORAGE)){
+                        //SHOW USER A MESSAGE
+                        new MaterialDialog.Builder(ControlActivity.this).title("Permission Required")
+                                .content("You need to  give the storage to easily save your filtered image")
+                                .negativeText("No")
+                                .positiveText("Yes")
+                                .canceledOnTouchOutside(true)
+                                .show();
+
+                    }  else{
                           ActivityCompat.requestPermissions(ControlActivity.this,new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},MY_PERMISSION_REQUEST_STORAGE_PERMISSION);
                      }
                      return;
@@ -140,9 +140,10 @@ mTickImageView = (ImageView)findViewById(R.id.imageView11);
             case MY_PERMISSION_REQUEST_STORAGE_PERMISSION:
                 if(grantResults.length > 0 && grantResults[0]== PackageManager.PERMISSION_GRANTED){
                     //show a message
-                    new MaterialDialog.Builder().title("Permission Granted")
+                    new MaterialDialog.Builder(ControlActivity.this).title("Permission Granted")
                             .content("Thank You for providing storage permission")
-                            .positiveText("OK").show().canceledOn.TouchOutSide(true).show();
+                            .canceledOnTouchOutside(true)
+                            .positiveText("OK").show();
 
                 }else{
                     Log.d(TAG,"Permission denied");
@@ -166,7 +167,7 @@ mTickImageView = (ImageView)findViewById(R.id.imageView11);
 
         }
     }
-
+//upto this point everything is working
     public void requestStoragePermissions(){
 
     }
