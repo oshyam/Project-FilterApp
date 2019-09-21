@@ -18,6 +18,9 @@ import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
 import com.zomato.photofilters.imageprocessors.Filter;
 import com.zomato.photofilters.imageprocessors.subfilters.BrightnessSubfilter;
+import com.zomato.photofilters.imageprocessors.subfilters.ContrastSubfilter;
+import com.zomato.photofilters.imageprocessors.subfilters.SaturationSubfilter;
+import com.zomato.photofilters.imageprocessors.subfilters.VignetteSubfilter;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -32,15 +35,76 @@ import android.view.View;
 import android.widget.ImageView;
 
 public class ControlActivity extends AppCompatActivity {
-
+   //static for zomatofilter effect using c library
+    static
     {
         System.loadLibrary("NativeImageProcessor");
     }
+
+
 
     Toolbar mControlToolbar;
     ImageView mTickImageView;
 
     ImageView mCenterImageView;
+    //added from here
+    Target mSmallTarget = new Target() {
+        @Override
+        public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
+            Bitmap workingBitmap = Bitmap.createBitmap(bitmap);
+            Bitmap mutableBitmap = workingBitmap.copy(Bitmap.Config.ARGB_8888,true);
+
+
+            Filter myFilter = new  Filter();
+            myFilter.addSubFilter (new BrightnessSubfilter(90));//90 is brightness intensity value
+            Bitmap ouputImage = myFilter.processFilter(mutableBitmap);
+
+            String  filename = System.currentTimeMillis()+"_brightness.png";
+            Helper.writeDataIntoExternalStorage(ControlActivity.this,filename, ouputImage);
+            Picasso.with(ControlActivity.this).load(Helper.getFileFromEXternlStorage(ControlActivity.this,filename)).fit() .centerInside().into(mFirstFilterPreviewimageView);
+
+            // Saturation Effect //not showing after compilation [Help]
+            mutableBitmap = workingBitmap.copy(Bitmap.Config.ARGB_8888,true);
+            Filter myFilterSaturation = new  Filter();
+            myFilterSaturation.addSubFilter (new SaturationSubfilter(1.7f));//1.7f is brightness intensity value
+            Bitmap ouputImageSaturation = myFilterSaturation.processFilter(mutableBitmap);
+
+            String  filenameSaturation = System.currentTimeMillis()+"_saturation.png";
+            Helper.writeDataIntoExternalStorage(ControlActivity.this,filenameSaturation, ouputImageSaturation);
+            Picasso.with(ControlActivity.this).load(Helper.getFileFromEXternlStorage(ControlActivity.this,filenameSaturation)).fit() .centerInside().into(mSecondFilterPreviewimageView);
+
+            //Vignette effect //not showing after compilation [Help]
+            mutableBitmap = workingBitmap.copy(Bitmap.Config.ARGB_8888,true);
+            Filter myFilterVignette = new  Filter();
+            myFilterVignette.addSubFilter(new VignetteSubfilter(ControlActivity.this, 170));//170 is brightness intensity value
+            Bitmap ouputImageVignette = myFilterVignette.processFilter(mutableBitmap);
+
+            String  filenameVignette = System.currentTimeMillis()+"_vignette.png";
+            Helper.writeDataIntoExternalStorage(ControlActivity.this,filenameVignette, ouputImageVignette);
+            Picasso.with(ControlActivity.this).load(Helper.getFileFromEXternlStorage(ControlActivity.this,filenameVignette)).fit() .centerInside().into(mThirdFilterPreviewimageView);
+
+            //contrast effect //not showing after compilation [Help]
+            mutableBitmap = workingBitmap.copy(Bitmap.Config.ARGB_8888,true);
+            Filter myFilterContrast = new  Filter();
+            myFilterContrast.addSubFilter(new ContrastSubfilter(1.6f));//1.6f is brightness intensity value
+            Bitmap ouputImageContrast = myFilterContrast.processFilter(mutableBitmap);
+
+            String  filenameContrast = System.currentTimeMillis()+"_contrast.png";
+            Helper.writeDataIntoExternalStorage(ControlActivity.this,filenameContrast, ouputImageContrast);
+            Picasso.with(ControlActivity.this).load(Helper.getFileFromEXternlStorage(ControlActivity.this,filenameContrast)).fit() .centerInside().into(mFourthFilterPreviewimageView);
+        }
+
+        @Override
+        public void onBitmapFailed(Drawable errorDrawable) {
+        }
+        @Override
+        public void onPrepareLoad(Drawable placeHolderDrawable) {
+
+        }
+    };
+
+    //ended here
+
     final static int  PICK_IMAGE = 2;
     final static int MY_PERMISSION_REQUEST_STORAGE_PERMISSION = 3;
 
@@ -90,8 +154,6 @@ mTickImageView = (ImageView)findViewById(R.id.imageView11);
                     return;
                 }
 
-
-
                 Intent intent = new Intent();
                 intent.setType("image/*");
                 intent.setAction(Intent.ACTION_GET_CONTENT);
@@ -99,31 +161,9 @@ mTickImageView = (ImageView)findViewById(R.id.imageView11);
             }
         });
 
-        Picasso.with(ControlActivity.this).load(R.drawable.center_image) .into(new Target() {
-            @Override
-            public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
-                Filter myFilter = new  Filter();
-                myFilter.addSubFilter (new BrightnessSubfilter(30));
-                Bitmap ouputImage = myFilter.processFilter(bitmap);
 
-                String  filename = System.currentTimeMillis()+"_brightness.png";
 
-                Helper.writeDataIntoExternalStorage(ControlActivity.this,filename, ouputImage);
 
-                Picasso.with(ControlActivity.this).load(Helper.getFileFromEXternlStorage(ControlActivity.this,filename)).fit() .centerInside().into(mFirstFilterPreviewimageView);
-
-            }
-
-            @Override
-            public void onBitmapFailed(Drawable errorDrawable) {
-
-            }
-
-            @Override
-            public void onPrepareLoad(Drawable placeHolderDrawable) {
-
-            }
-        });
 
     }
 
@@ -150,6 +190,9 @@ mTickImageView = (ImageView)findViewById(R.id.imageView11);
             Uri selectedImageUri = data.getData();
 
             Picasso.with(ControlActivity.this).load(selectedImageUri) .fit().centerInside(). into(mCenterImageView);
+            //added here
+            Picasso.with(ControlActivity.this).load(R.drawable.center_image) .into(mSmallTarget);
+            //ended here
 
             Picasso.with(ControlActivity.this).load(selectedImageUri).fit().centerInside().  into(mFirstFilterPreviewimageView);
             Picasso.with(ControlActivity.this).load(selectedImageUri).fit().centerInside().  into(mSecondFilterPreviewimageView);
