@@ -11,6 +11,7 @@ import android.net.Uri;
 import android.nfc.Tag;
 import android.os.Bundle;
 
+import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.example.filter.utility.Helper;
 import com.squareup.picasso.Picasso;
@@ -18,11 +19,13 @@ import com.squareup.picasso.Target;
 import com.zomato.photofilters.imageprocessors.Filter;
 import com.zomato.photofilters.imageprocessors.subfilters.BrightnessSubfilter;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
+import android.provider.Settings;
 import android.util.Log;
 import android.view.View;
 
@@ -80,25 +83,14 @@ mTickImageView = (ImageView)findViewById(R.id.imageView11);
         mCenterImageView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
+//cut from here
                 requestStoragePermissions();
 
                 if(ContextCompat.checkSelfPermission(ControlActivity.this,Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED){
-
-                    if(ActivityCompat.shouldShowRequestPermissionRationale(ControlActivity.this,Manifest.permission.WRITE_EXTERNAL_STORAGE)){
-                        //SHOW USER A MESSAGE
-                        new MaterialDialog.Builder(ControlActivity.this).title("Permission Required")
-                                .content("You need to  give the storage to easily save your filtered image")
-                                .negativeText("No")
-                                .positiveText("Yes")
-                                .canceledOnTouchOutside(true)
-                                .show();
-
-                    }  else{
-                          ActivityCompat.requestPermissions(ControlActivity.this,new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},MY_PERMISSION_REQUEST_STORAGE_PERMISSION);
-                     }
-                     return;
+                    return;
                 }
+
+
 
                 Intent intent = new Intent();
                 intent.setType("image/*");
@@ -169,6 +161,30 @@ mTickImageView = (ImageView)findViewById(R.id.imageView11);
     }
 //upto this point everything is working
     public void requestStoragePermissions(){
+
+        //cut from imageview
+        if(ContextCompat.checkSelfPermission(ControlActivity.this,Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED){
+
+            if(ActivityCompat.shouldShowRequestPermissionRationale(ControlActivity.this,Manifest.permission.WRITE_EXTERNAL_STORAGE)){
+                //SHOW USER A MESSAGE
+                new MaterialDialog.Builder(ControlActivity.this).title("Permission Required")
+                        .content("You need to  give the storage to easily save your filtered image")
+                        .negativeText("No")
+                        .positiveText("Yes")
+                        .canceledOnTouchOutside(true)
+                        .onPositive(new MaterialDialog.SingleButtonCallback() {
+                            @Override
+                            public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                                startActivityForResult(new Intent(Settings.ACTION_SETTINGS),0);
+                            }
+                        })
+                        .show();
+
+            }  else{
+                ActivityCompat.requestPermissions(ControlActivity.this,new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},MY_PERMISSION_REQUEST_STORAGE_PERMISSION);
+            }
+            return;
+        }
 
     }
 
